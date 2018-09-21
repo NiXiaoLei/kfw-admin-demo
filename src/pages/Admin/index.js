@@ -2,7 +2,7 @@
  * @Author: nxl 
  * @Date: 2018-09-20 16:19:59 
  * @Last Modified by: nxl
- * @Last Modified time: 2018-09-21 15:40:42
+ * @Last Modified time: 2018-09-21 18:14:20
  */
 import React, { PureComponent } from 'react'
 import { Route, Switch, Link } from 'react-router-dom'
@@ -15,7 +15,7 @@ import {
   } from './style'
 const { Header, Sider, Content, Footer } = Layout;
 const SubMenu = Menu.SubMenu;
-const MenuItemGroup = Menu.ItemGroup;
+const MenuItem = Menu.Item
 
 const routerRules = [
   { path: '/index', exact: true, component: Chart },
@@ -24,16 +24,18 @@ const routerRules = [
 
 
 const headMenu = [
-  { title: '标题一', path: '/admin/index' },
-  { title: '标题二', path: '/admin/index' },
-  { title: '标题三', path: '/admin/index' },
-  { title: '标题四', path: '/admin/index' }
+  { title: '标题一', to: '/admin/index' },
+  { title: '标题一', to: '/admin/index2' },
+  { title: '标题一', to: '/admin/index3' },
+  { title: '标题一', to: '/admin/index4' },
+  { title: '标题一', to: '/admin/index5' },
+  { title: '标题一', to: '/admin/index6' }
 ]
 
 const LeftMenu = [
   { title: '标题一', path: '/admin/index', 
     children: [
-      // {title: }
+      // {link: }
     ]}
 ]
 
@@ -47,16 +49,31 @@ export default class Admin extends PureComponent {
     this.state = {
       collapsed: false,
       defPath: this.props.match.path,
-      isMenuFold: false
+      isMenuFold: false,
+      headMenu
     }
     
     this.leftMenuGener = this.leftMenuGener.bind(this)
   }
 
   toggle = () => {
+    console.log('被触发了')
     this.setState({
       collapsed: !this.state.collapsed,
     })
+  }
+
+  headMenuHandle = (e, { type, index, to}) => {
+    switch(type){
+      case 'del':
+        let headMenu = [ ...this.state.headMenu]
+        headMenu.splice(index-1, 1)
+        this.setState({ headMenu })
+        break;
+      case 'cut':
+        this.props.history.push(to)
+        break;
+    }
   }
 
 
@@ -67,22 +84,22 @@ export default class Admin extends PureComponent {
    * @return { Element-Array }
    */
   routerGener = rules => rules.map((rule, index) => ( <Route {...{ ...rule, path: `${this.state.defPath}${rule.path}` }}   key={index} /> ))
-  headMenuGener = rules => rules.map((rule, index) => ( <Menu.Item key={index}>{ rule.title }<Icon type="close" theme="outlined" /></Menu.Item> ))
-
-  // leftMenuGener = (rules) => rules.map((rule, index) => (
-  //   <SubMenu key={index} title={<span><Icon type="mail" /><span>Navigation One{index}</span></span>}>
-  //     <MenuItemGroup title="Item 1">
-  //       <Menu.Item key="1">Option 1</Menu.Item>
-  //       <Menu.Item key="2">Option 2</Menu.Item>
-  //     </MenuItemGroup>
-  //     <MenuItemGroup title="Iteom 2">
-  //       <Menu.Item key="3">Option 3</Menu.Item>
-  //       <Menu.Item key="4">Option 4</Menu.Item>
-  //     </MenuItemGroup>
-  //   </SubMenu>
-  // ))
-
-
+  headMenuGener = rules => rules.map((rule, index) => {
+    const { to } = rule
+    return (
+      <MenuItem key={index}
+        // 路由跳转
+        onClick={ (e) => this.headMenuHandle(e, {type: 'cut', to })} >
+          { rule.title }
+          <Icon type="close"   
+            theme="outlined"  
+            style={{marginLeft: 5}}
+            // 删除标签
+            onClick={ (e) => this.headMenuHandle(e , {type: 'del', to })} 
+          />
+      </MenuItem> 
+    )
+  })
 
   /**
    *  生成 menu 菜单
@@ -91,29 +108,31 @@ export default class Admin extends PureComponent {
    * @memberof nxl
    */
   leftMenuGener(rules) {
-    console.log(rules)
     // const returnGroup = () => {
     // }
 
     return rules.map((rule, index) => (
-      <SubMenu key={index} title={<span><Icon type="mail" /><span>Navigation One{index}</span></span>}>
-        <Menu.Item key="1">Option 1</Menu.Item>
-        <Menu.Item key="2">Option 2</Menu.Item>
+      <SubMenu key={index} title={<span>
+        <Icon type="mail" />
+          <span>Navigation One{index}</span>
+        </span>} >
+        <MenuItem key="1">Option 1</MenuItem>
+        <MenuItem key="2">Option 2</MenuItem>
         <SubMenu title="2级子菜单">
-          <Menu.Item key="11">Option 1</Menu.Item>
-          <Menu.Item key="21">Option 2</Menu.Item>
+          <MenuItem key="11">Option 1</MenuItem>
+          <MenuItem key="21">Option 2</MenuItem>
           <SubMenu title="3级子菜单">
-            <Menu.Item key="13">Option 33</Menu.Item>
-            <Menu.Item key="24">Option 333</Menu.Item>
+            <MenuItem key="13">Option 33</MenuItem>
+            <MenuItem key="24">Option 333</MenuItem>
             <SubMenu title="4级子菜单">
-              <Menu.Item key="133">Option 314443</Menu.Item>
-              <Menu.Item key="243">Option 3344443</Menu.Item>
+              <MenuItem key="133">Option 314443</MenuItem>
+              <MenuItem key="243">Option 3344443</MenuItem>
             </SubMenu>
           </SubMenu>
         </SubMenu>
-        <Menu.Item key="5"> Option 2 </Menu.Item>
-        <Menu.Item key="3">Option 3</Menu.Item>
-        <Menu.Item key="4">Option 4</Menu.Item>
+        <MenuItem key="5"> Option 2 </MenuItem>
+        <MenuItem key="3">Option 3</MenuItem>
+        <MenuItem key="4">Option 4</MenuItem>
       </SubMenu>
     ))
   }
@@ -133,7 +152,7 @@ export default class Admin extends PureComponent {
 
 
   render() {
-    const { isMenuFold } = this.state
+    const { isMenuFold, headMenu } = this.state
     return (
      
       <Layout>
@@ -156,8 +175,12 @@ export default class Admin extends PureComponent {
                 style={{ lineHeight: '62px'}}
               > 
                 {/* 菜单收缩开关 */}
-                <MenuIIB onClick={this.changeMenuStatusHandle} >
-                  <Icon type="menu-fold" onClick={this.changeMenuStatusHandle} className="pointer ant-menu-item" theme="outlined" />
+                <MenuIIB  >
+                  <Icon 
+                    type={ isMenuFold? 'menu-unfold' : 'menu-fold' }  
+                    onClick={this.changeMenuStatusHandle}
+                    className="pointer ant-menu-item" theme="outlined" 
+                  />
                 </MenuIIB>
                 { this.headMenuGener(headMenu) }
                 
@@ -182,6 +205,7 @@ export default class Admin extends PureComponent {
             <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
               <Switch>
                 { this.routerGener( routerRules ) }
+                
               </Switch>
             </Content>
           </Layout>

@@ -2,7 +2,7 @@
  * @Author: nxl 
  * @Date: 2018-09-20 16:20:19 
  * @Last Modified by: nxl
- * @Last Modified time: 2018-09-21 14:07:09
+ * @Last Modified time: 2018-09-21 18:05:56
  */
 import styled from 'styled-components'
 
@@ -38,8 +38,11 @@ export const MenuIIB = styled.div`
   /* padding: 0 24px; */
   /* border-right: 1px solid #ddd; */
 
+
+
+
   & .pointer {
-    display: inline-flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     line-height: 40px;
